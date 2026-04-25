@@ -1,0 +1,112 @@
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <meta charset="UTF-8">
+ <title>Dreamscape Dash</title>
+
+
+ <style>
+   body {
+     margin: 0;
+     height: 100vh;
+     background: url("CloudSkyPic.png") center / cover no-repeat;
+
+
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     flex-direction: column;
+   }
+
+
+   /* this is title text */
+   h1 {
+     font-family: "Courier New", monospace;
+     color: white;
+     font-size: 48px;
+     text-shadow: 4px 4px #3b3b98;
+     margin-bottom: 40px;
+   }
+
+
+   /* this is start button */
+   .startbutton {
+     font-family: "Courier New", monospace;
+     font-size: 18px;
+     text-transform: uppercase;
+
+
+     color: white;
+     background-color: #6c5ce7;
+
+
+     padding: 15px 30px;
+     border: 4px solid #3b3b98;
+
+
+     box-shadow:
+       4px 4px 0px #3b3b98,
+       8px 8px 0px #222;
+
+
+     cursor: pointer;
+     image-rendering: pixelated;
+
+
+     transition: all 0.1s ease;
+   }
+
+
+   .startbutton:active {
+     box-shadow:
+       2px 2px 0px #3b3b98,
+       4px 4px 0px #222;
+
+
+     transform: translate(4px, 4px);
+   }
+
+
+   /* this game canvas starts the game */
+   #gameCanvas {
+     display: none;
+     background: transparent;
+   }
+ </style>
+</head>
+
+
+<body>
+
+
+ <h1>Dreamscape Dash</h1>
+ <button class="startbutton">Start Playing</button>
+
+
+ <canvas id="gameCanvas"></canvas>
+/*this starts the js stuff
+ <script>
+   const button = document.querySelector(".startbutton");
+   const canvas = document.getElementById("gameCanvas");
+
+
+   button.addEventListener("click", () => {
+     button.style.display = "none";
+     document.querySelector("h1").style.display = "none";
+
+
+     canvas.style.display = "block";
+
+
+    
+     console.log("Game starting...");
+   });
+ </script>
+
+
+</body>
+</html>
+
