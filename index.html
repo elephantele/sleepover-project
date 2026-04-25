@@ -1,112 +1,453 @@
-
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
- <meta charset="UTF-8">
- <title>Dreamscape Dash</title>
-
-
- <style>
-   body {
-     margin: 0;
-     height: 100vh;
-     background: url("CloudSkyPic.png") center / cover no-repeat;
-
-
-     display: flex;
-     justify-content: center;
-     align-items: center;
-     flex-direction: column;
-   }
-
-
-   /* this is title text */
-   h1 {
-     font-family: "Courier New", monospace;
-     color: white;
-     font-size: 48px;
-     text-shadow: 4px 4px #3b3b98;
-     margin-bottom: 40px;
-   }
-
-
-   /* this is start button */
-   .startbutton {
-     font-family: "Courier New", monospace;
-     font-size: 18px;
-     text-transform: uppercase;
-
-
-     color: white;
-     background-color: #6c5ce7;
-
-
-     padding: 15px 30px;
-     border: 4px solid #3b3b98;
-
-
-     box-shadow:
-       4px 4px 0px #3b3b98,
-       8px 8px 0px #222;
-
-
-     cursor: pointer;
-     image-rendering: pixelated;
-
-
-     transition: all 0.1s ease;
-   }
-
-
-   .startbutton:active {
-     box-shadow:
-       2px 2px 0px #3b3b98,
-       4px 4px 0px #222;
-
-
-     transform: translate(4px, 4px);
-   }
-
-
-   /* this game canvas starts the game */
-   #gameCanvas {
-     display: none;
-     background: transparent;
-   }
- </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloud Catcher</title>
+<style>
+ * { margin: 0; padding: 0; box-sizing: border-box; }
+ body {
+   background: #0d0020;
+   display: flex;
+   align-items: center;
+   justify-content: center;
+   min-height: 100vh;
+   font-family: monospace;
+ }
+ #shell {
+   position: relative;
+   width: 480px;
+   height: 580px;
+   overflow: hidden;
+   image-rendering: pixelated;
+ }
+ #gc {
+   display: block;
+   image-rendering: pixelated;
+   image-rendering: crisp-edges;
+ }
+ #startScreen, #endScreen {
+   position: absolute;
+   inset: 0;
+   display: flex;
+   flex-direction: column;
+   align-items: center;
+   justify-content: center;
+   gap: 14px;
+   background: rgba(8, 0, 25, 0.88);
+   z-index: 10;
+ }
+ #endScreen { display: none; }
+ .ptitle {
+   font-size: 24px;
+   font-weight: 700;
+   color: #f9d6ff;
+   letter-spacing: 4px;
+   text-transform: uppercase;
+   text-shadow: 3px 3px 0 #7c3aed, -1px -1px 0 #4c1d95;
+ }
+ .psub {
+   font-size: 11px;
+   color: #c4a8e8;
+   letter-spacing: 1px;
+   text-align: center;
+   line-height: 2;
+ }
+ .psub span.good { color: #f9a8d4; }
+ .psub span.bad  { color: #a78bfa; }
+ .pbtn {
+   font-family: monospace;
+   font-size: 13px;
+   font-weight: 700;
+   letter-spacing: 3px;
+   color: #1a0a2e;
+   background: #f9d6ff;
+   border: none;
+   padding: 10px 32px;
+   cursor: pointer;
+   text-transform: uppercase;
+   box-shadow: 4px 4px 0 #7c3aed;
+   transition: transform .1s, box-shadow .1s;
+ }
+ .pbtn:hover { transform: translate(2px,2px); box-shadow: 2px 2px 0 #7c3aed; }
+ .pbtn:active { transform: translate(4px,4px); box-shadow: none; }
+ #hud {
+   position: absolute;
+   top: 0; left: 0; right: 0;
+   display: none;
+   justify-content: space-between;
+   padding: 8px 14px;
+   z-index: 5;
+   pointer-events: none;
+   background: rgba(0,0,0,0.35);
+ }
+ .htxt {
+   font-size: 12px;
+   font-weight: 700;
+   color: #f9d6ff;
+   letter-spacing: 1px;
+   text-shadow: 1px 1px 0 #000;
+ }
+ #progBar {
+   position: absolute;
+   bottom: 0; left: 0;
+   height: 5px;
+   background: linear-gradient(90deg, #f472b6, #a78bfa);
+   z-index: 6;
+   transition: width .4s;
+   pointer-events: none;
+ }
+ #endScore {
+   font-size: 36px;
+   font-weight: 700;
+   color: #f9d6ff;
+   text-shadow: 3px 3px 0 #7c3aed;
+ }
+ #endMsg { font-size: 12px; color: #f9a8d4; letter-spacing: 2px; }
+ #endTitle {
+   font-size: 22px;
+   font-weight: 700;
+   color: #f9d6ff;
+   letter-spacing: 3px;
+   text-shadow: 2px 2px 0 #7c3aed;
+ }
+ #flashMsg {
+   position: absolute;
+   top: 40px; left: 50%;
+   transform: translateX(-50%);
+   font-size: 14px;
+   font-weight: 700;
+   letter-spacing: 2px;
+   pointer-events: none;
+   z-index: 8;
+   opacity: 0;
+   transition: opacity .15s;
+   text-shadow: 1px 1px 0 #000;
+ }
+</style>
 </head>
-
-
 <body>
-
-
- <h1>Dreamscape Dash</h1>
- <button class="startbutton">Start Playing</button>
-
-
- <canvas id="gameCanvas"></canvas>
-/*this starts the js stuff
- <script>
-   const button = document.querySelector(".startbutton");
-   const canvas = document.getElementById("gameCanvas");
-
-
-   button.addEventListener("click", () => {
-     button.style.display = "none";
-     document.querySelector("h1").style.display = "none";
-
-
-     canvas.style.display = "block";
-
-
-    
-     console.log("Game starting...");
-   });
- </script>
-
-
+<div id="shell">
+ <canvas id="gc"></canvas>
+ <div id="hud">
+   <span class="htxt" id="scoreTxt">SCORE: 0</span>
+   <span class="htxt" id="timeTxt">TIME: 90</span>
+   <span class="htxt">GOAL: 150</span>
+ </div>
+ <div id="progBar" style="width:0%"></div>
+ <div id="flashMsg"></div>
+ <div id="startScreen">
+   <div class="ptitle">Cloud Catcher</div>
+   <canvas id="previewC" width="64" height="72" style="image-rendering:pixelated;width:64px;height:72px;margin:4px 0"></canvas>
+   <div class="psub">
+     Catch <span class="good">COTTON CANDY</span> clouds &nbsp;+10 pts<br>
+     Dodge <span class="bad">STORM</span> clouds &nbsp;&minus;15 pts<br>
+     Reach <strong style="color:#f9d6ff">150 points</strong> in 90 seconds!<br><br>
+     Use &larr; &rarr; arrow keys to move
+   </div>
+   <button class="pbtn" id="startBtn">PLAY</button>
+ </div>
+ <div id="endScreen">
+   <div id="endTitle">TIME'S UP</div>
+   <div id="endScore">0</div>
+   <div id="endMsg">BETTER LUCK NEXT TIME</div>
+   <button class="pbtn" id="restartBtn">PLAY AGAIN</button>
+ </div>
+</div>
+<script>
+const SHELL_W = 480, SHELL_H = 580;
+const SCALE = 3;
+const W = Math.floor(SHELL_W / SCALE); // 160 pixels wide
+const H = Math.floor(SHELL_H / SCALE); // 193 pixels tall
+const shell = document.getElementById('shell');
+shell.style.width  = SHELL_W + 'px';
+shell.style.height = SHELL_H + 'px';
+const gc = document.getElementById('gc');
+gc.width  = SHELL_W;
+gc.height = SHELL_H;
+gc.style.width  = SHELL_W + 'px';
+gc.style.height = SHELL_H + 'px';
+const ctx = gc.getContext('2d');
+ctx.imageSmoothingEnabled = false;
+// ─── pixel helper ────────────────────────────────────────────
+function px(x, y, w, h, c) {
+ ctx.fillStyle = c;
+ ctx.fillRect(x * SCALE, y * SCALE, w * SCALE, h * SCALE);
+}
+// draw sky background
+function drawBg(t) {
+ // sky gradient via horizontal bands
+ const skyColors = ['#0d0035','#150044','#1a0050','#1e005c','#1a0050','#150044'];
+ const bh = Math.ceil(H / skyColors.length);
+ skyColors.forEach((c, i) => {
+   ctx.fillStyle = c;
+   ctx.fillRect(0, i * bh * SCALE, SHELL_W, bh * SCALE);
+ });
+ // stars (static positions from seed)
+ const stars = [[12,8],[40,5],[70,12],[100,4],[130,9],[22,20],[55,18],[90,22],[145,6],[8,30],[120,28],[60,3]];
+ stars.forEach(([sx, sy]) => {
+   const twinkle = Math.sin(t * 0.04 + sx + sy) > 0.5;
+   px(sx, sy, 1, 1, twinkle ? '#ffffff' : '#8888cc');
+ });
+ // ground
+ for (let gx = 0; gx < W; gx += 2) {
+   px(gx, H - 4, 2, 4, '#2d1b69');
+ }
+ for (let gx = 1; gx < W; gx += 4) {
+   px(gx, H - 5, 1, 1, '#3d2b79');
+ }
+}
+//  pixel bunny basket
+function drawBunny(bx, by) {
+ const x = Math.floor(bx), y = Math.floor(by);
+ // ears
+ px(x+3, y-8, 3, 8, '#f5c6ff');
+ px(x+10, y-8, 3, 8, '#f5c6ff');
+ px(x+4, y-7, 1, 6, '#f9a8d4');
+ px(x+11, y-7, 1, 6, '#f9a8d4');
+ // head
+ px(x+2, y, 12, 2, '#f9d6ff');
+ px(x+1, y+2, 14, 4, '#f9d6ff');
+ px(x+2, y+6, 12, 2, '#f9d6ff');
+ // eyes
+ px(x+4, y+2, 2, 2, '#7c3aed');
+ px(x+10, y+2, 2, 2, '#7c3aed');
+ px(x+5, y+3, 1, 1, '#ffffff');
+ px(x+11, y+3, 1, 1, '#ffffff');
+ // nose + mouth
+ px(x+7, y+5, 2, 1, '#f472b6');
+ px(x+6, y+6, 1, 1, '#f9a8d4');
+ px(x+9, y+6, 1, 1, '#f9a8d4');
+ // body
+ px(x+2, y+8, 12, 7, '#f9d6ff');
+ px(x+1, y+9, 14, 5, '#f9d6ff');
+ // belly
+ px(x+5, y+9, 6, 4, '#ffe0f7');
+ // arms
+ px(x, y+9, 2, 4, '#f5c6ff');
+ px(x+14, y+9, 2, 4, '#f5c6ff');
+ // legs
+ px(x+3, y+15, 4, 3, '#f5c6ff');
+ px(x+9, y+15, 4, 3, '#f5c6ff');
+ px(x+2, y+17, 4, 2, '#f0b0f0');
+ px(x+10, y+17, 4, 2, '#f0b0f0');
+ // basket (held in front)
+ // basket body
+ px(x+2, y+12, 12, 6, '#b45309');
+ px(x+3, y+13, 10, 4, '#92400e');
+ // basket weave lines
+ for (let bxi = 0; bxi < 5; bxi++) {
+   px(x+3+bxi*2, y+13, 1, 4, '#a16207');
+ }
+ px(x+2, y+13, 12, 1, '#fbbf24');
+ px(x+2, y+15, 12, 1, '#fbbf24');
+ // basket handle
+ px(x+5, y+11, 6, 1, '#92400e');
+ px(x+4, y+12, 1, 1, '#92400e');
+ px(x+11, y+12, 1, 1, '#92400e');
+}
+// ─── draw cotton candy cloud ──────────────────────────────────
+function drawCottonCloud(x, y, frame) {
+ const X = Math.floor(x), Y = Math.floor(y);
+ const bob = Math.floor(Math.sin(frame * 0.08) * 1);
+ // main fluffy body - multiple pink overlapping blobs
+ px(X+4, Y+bob, 10, 4, '#ff99dd');
+ px(X+2, Y+2+bob, 14, 5, '#ffb3e6');
+ px(X, Y+4+bob, 18, 6, '#ffc0eb');
+ px(X+1, Y+7+bob, 16, 4, '#ffb3e6');
+ px(X+3, Y+9+bob, 12, 3, '#ff99dd');
+ // highlights
+ px(X+6, Y+1+bob, 4, 2, '#ffe0f5');
+ px(X+10, Y+2+bob, 3, 2, '#ffe0f5');
+ px(X+2, Y+5+bob, 3, 2, '#ffe0f5');
+ // darker pink shading bottom
+ px(X+2, Y+10+bob, 14, 2, '#e879c0');
+ px(X+4, Y+11+bob, 10, 1, '#e879c0');
+ // little star sparkles
+ if (Math.floor(frame / 6) % 2 === 0) {
+   px(X+15, Y+1+bob, 2, 1, '#ffffff');
+   px(X+16, Y+2+bob, 1, 1, '#ffffff');
+   px(X+15, Y+3+bob, 1, 1, '#ffffff');
+ }
+ // score label hint
+ ctx.fillStyle = '#ffe0f5';
+ ctx.font = `bold ${SCALE * 4}px monospace`;
+ ctx.textAlign = 'center';
+ ctx.fillText('+10', (X + 9) * SCALE, (Y + bob - 2) * SCALE);
+}
+// ─── draw storm cloud ─────────────────────────────────────────
+function drawStormCloud(x, y, frame) {
+ const X = Math.floor(x), Y = Math.floor(y);
+ // dark cloud body
+ px(X+3, Y, 12, 3, '#4a4a6a');
+ px(X+1, Y+2, 16, 6, '#3a3a5a');
+ px(X, Y+5, 18, 5, '#2e2e4e');
+ px(X+1, Y+8, 16, 3, '#3a3a5a');
+ px(X+3, Y+9, 12, 2, '#4a4a6a');
+ // highlights
+ px(X+4, Y+1, 4, 2, '#5a5a7a');
+ px(X+9, Y+2, 3, 2, '#5a5a7a');
+ // lightning bolt
+ const lf = Math.floor(frame / 4) % 6;
+ if (lf < 3) {
+   // bolt
+   px(X+8, Y+5, 3, 3, '#fde68a');
+   px(X+7, Y+7, 3, 2, '#fde68a');
+   px(X+9, Y+8, 3, 2, '#fde68a');
+   px(X+8, Y+9, 2, 2, '#fbbf24');
+   // glow
+   px(X+7, Y+4, 5, 1, '#fef3c7');
+ }
+ // rain drops below cloud
+ const rainPhase = Math.floor(frame / 3) % 4;
+ const dropPositions = [3, 7, 11, 15];
+ dropPositions.forEach((dx, i) => {
+   const dropY = Y + 11 + ((rainPhase + i) % 4);
+   px(X + dx, dropY, 1, 2, '#93c5fd');
+   px(X + dx, dropY + 3, 1, 2, '#93c5fd');
+ });
+ // score label hint
+ ctx.fillStyle = '#fca5a5';
+ ctx.font = `bold ${SCALE * 4}px monospace`;
+ ctx.textAlign = 'center';
+ ctx.fillText('-15', (X + 9) * SCALE, (Y - 2) * SCALE);
+}
+// ─── preview bunny on start screen ───────────────────────────
+(function drawPreview() {
+ const pc = document.getElementById('previewC');
+ const pctx = pc.getContext('2d');
+ pctx.imageSmoothingEnabled = false;
+ function p(x,y,w,h,c){pctx.fillStyle=c;pctx.fillRect(x*2,y*2,w*2,h*2);}
+ // mini bunny preview (scale 2)
+ p(3,0,3,8,'#f5c6ff'); p(10,0,3,8,'#f5c6ff');
+ p(4,1,1,6,'#f9a8d4'); p(11,1,1,6,'#f9a8d4');
+ p(2,8,12,2,'#f9d6ff'); p(1,10,14,4,'#f9d6ff'); p(2,14,12,2,'#f9d6ff');
+ p(4,10,2,2,'#7c3aed'); p(10,10,2,2,'#7c3aed');
+ p(7,13,2,1,'#f472b6');
+ p(2,16,12,7,'#f9d6ff'); p(1,17,14,5,'#f9d6ff');
+ p(5,17,6,4,'#ffe0f7');
+ p(2,20,12,6,'#b45309'); p(3,21,10,4,'#92400e');
+ p(2,21,12,1,'#fbbf24'); p(2,23,12,1,'#fbbf24');
+ p(5,19,6,1,'#92400e');
+})();
+// ─── game state ───────────────────────────────────────────────
+let score = 0, timeLeft = 90, gameRunning = false;
+let clouds = [], cloudTimer, tickTimer, rafId, frameCount = 0;
+let keys = {};
+let flashText = '', flashColor = '#ffffff', flashOpacity = 0;
+document.addEventListener('keydown', e => { keys[e.key] = true; });
+document.addEventListener('keyup',   e => { keys[e.key] = false; });
+function spawnCloud() {
+ const good = Math.random() > 0.38;
+ const cw = good ? 18 : 18;
+ clouds.push({
+   x: Math.random() * (W - cw - 2) + 1,
+   y: -14,
+   w: cw,
+   h: good ? 12 : 11,
+   speed: 0.5 + Math.random() * 0.8,
+   type: good ? 'cotton' : 'storm',
+   frame: Math.floor(Math.random() * 60)
+ });
+}
+function collide(a, b) {
+ // slightly forgiving hitbox
+ return (
+   a.x + 2 < b.x + b.w - 2 &&
+   a.x + a.w - 2 > b.x + 2 &&
+   a.y < b.y + b.h &&
+   a.y + a.h > b.y
+ );
+}
+function showFlash(text, color) {
+ flashText = text;
+ flashColor = color;
+ flashOpacity = 1;
+}
+function startGame() {
+ score = 0; timeLeft = 90; clouds = []; frameCount = 0;
+ bunny.x = W / 2 - bunny.w / 2;
+ bunny.y = H - bunny.h - 4;
+ gameRunning = true;
+ document.getElementById('hud').style.display = 'flex';
+ document.getElementById('startScreen').style.display = 'none';
+ document.getElementById('endScreen').style.display = 'none';
+ cloudTimer = setInterval(spawnCloud, 900);
+ tickTimer  = setInterval(() => {
+   timeLeft--;
+   document.getElementById('timeTxt').textContent = 'TIME: ' + timeLeft;
+   if (timeLeft <= 0) endGame(false);
+ }, 1000);
+ loop();
+}
+function endGame(win) {
+ gameRunning = false;
+ clearInterval(cloudTimer);
+ clearInterval(tickTimer);
+ cancelAnimationFrame(rafId);
+ const es = document.getElementById('endScreen');
+ document.getElementById('endTitle').textContent = win ? 'YOU WIN!' : "TIME'S UP";
+ document.getElementById('endScore').textContent = score;
+ document.getElementById('endMsg').textContent = win
+   ? 'AMAZING CATCHING!'
+   : score >= 100 ? 'SO CLOSE!' : 'BETTER LUCK NEXT TIME';
+ es.style.display = 'flex';
+}
+const bunny = { x: 0, y: 0, w: 16, h: 19, speed: 1.8 };
+function loop() {
+ if (!gameRunning) return;
+ frameCount++;
+ ctx.clearRect(0, 0, SHELL_W, SHELL_H);
+ drawBg(frameCount);
+ // move bunny
+ if (keys['ArrowLeft'])  bunny.x -= bunny.speed;
+ if (keys['ArrowRight']) bunny.x += bunny.speed;
+ bunny.x = Math.max(0, Math.min(W - bunny.w, bunny.x));
+ // clouds
+ for (let i = clouds.length - 1; i >= 0; i--) {
+   const c = clouds[i];
+   c.y += c.speed;
+   c.frame++;
+   if (c.type === 'cotton') drawCottonCloud(c.x, c.y, c.frame);
+   else                     drawStormCloud(c.x, c.y, c.frame);
+   // catch check — basket area
+   const basket = {
+     x: bunny.x + 2, y: bunny.y + 12,
+     w: 12,          h: 6
+   };
+   if (collide(basket, { x: c.x, y: c.y + c.h - 3, w: c.w, h: 3 })) {
+     if (c.type === 'cotton') {
+       score += 10;
+       showFlash('+10', '#f9a8d4');
+     } else {
+       score -= 15;
+       showFlash('-15', '#f87171');
+     }
+     clouds.splice(i, 1);
+     document.getElementById('scoreTxt').textContent = 'SCORE: ' + score;
+     const pct = Math.min(100, Math.max(0, (score / 150) * 100));
+     document.getElementById('progBar').style.width = pct + '%';
+     if (score >= 150) { endGame(true); return; }
+     continue;
+   }
+   if (c.y > H + 2) clouds.splice(i, 1);
+ }
+ drawBunny(bunny.x, bunny.y);
+ // flash text
+ if (flashOpacity > 0) {
+   ctx.globalAlpha = flashOpacity;
+   ctx.fillStyle = flashColor;
+   ctx.font = `bold ${SCALE * 5}px monospace`;
+   ctx.textAlign = 'center';
+   ctx.fillText(flashText, bunny.x * SCALE + bunny.w * SCALE / 2, bunny.y * SCALE - SCALE * 4);
+   ctx.globalAlpha = 1;
+   flashOpacity -= 0.05;
+ }
+ rafId = requestAnimationFrame(loop);
+}
+document.getElementById('startBtn').addEventListener('click', startGame);
+document.getElementById('restartBtn').addEventListener('click', startGame);
+</script>
 </body>
 </html>
 
