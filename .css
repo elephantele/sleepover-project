@@ -1,1 +1,69 @@
+/* General page styling */
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(#87CEEB, #ffffff);
+    font-family: Arial, sans-serif;
+    text-align: center;
+}
 
+/* Title */
+h1 {
+    margin-top: 20px;
+    color: #333;
+}
+
+/* Score + Timer */
+#hud {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    font-size: 22px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+/* Game Area */
+#gameArea {
+    width: 500px;
+    height: 600px;
+    background: #e0f7ff;
+    border: 3px solid #333;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+/* Pillow (player) */
+#pillow {
+    width: 80px;
+    height: 40px;
+    background: pink;
+    border-radius: 20px;
+    position: absolute;
+    bottom: 10px;
+    left: 210px; /* centered */
+    box-shadow: 0 0 10px rgba(255, 105, 180, 0.7);
+}
+
+/* Clouds */
+.cloud {
+    width: 60 px;
+    height: 40 px;
+    position: absolute;
+    top: -50px;
+    border-radius: 50%;
+}
+
+/* cotton candy cloud */
+.good {
+    background: white;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+}
+
+/* stormy cloud */
+.bad {
+    background: gray;
+    box-shadow: 0 0 10px rgba(100, 100, 100, 0.8);
+}
