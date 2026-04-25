@@ -1,1 +1,1 @@
-This game is a web-based arcade game that is similar to Temple Run. The character of the player's choosing will be able to use the arrow keys and the space bar to navigate through challenges. 
+This game is a web-based arcade game that is similar to Temple Run. The character of the player's choosing will be able to use the arrow keys and the space bar to navigate through challenges. The player can earn points by getting more of stars. When the player gets 50 stars, the girl will be able to successfully escape her nightmare and be saved by her friends. 
